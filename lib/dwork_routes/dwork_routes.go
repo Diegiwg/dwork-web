@@ -3,85 +3,127 @@ package dwork_routes
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"path"
 	"strings"
-
-	"github.com/Diegiwg/dwork-web/lib/dwork_logger"
 )
 
+type RouteHandler func(http.ResponseWriter, *http.Request) string
+type DynamicRouteHandler func(http.ResponseWriter, *http.Request, RouteParams) string
+
+type RouteParams map[string]string
+
 type Route struct {
-	path    string
-	Content string
+	Kind    string
+	Path    string
+	Params  RouteParams
+	Handler RouteHandler
+	Routes  Routes
 }
 
-func MakeRoute() map[string]Route {
-	routes := make(map[string]Route)
-	return routes
+type Routes map[string]*Route
+
+func MakeRouter() Routes {
+	return make(map[string]*Route)
 }
 
-func RegisterRoute(routes *map[string]Route, path string, content string) {
-	(*routes)[path] = Route{
-		path:    path,
-		Content: content,
-	}
-}
+// Build common route map
+func commonRoute(routes *Routes, path string, handler RouteHandler) {
+	// strip the slash's
+	path = strings.TrimLeft(path, "/")
+	path = strings.TrimRight(path, "/")
 
-func recursiveRegisterRoutes(routes *map[string]Route, indexPageName string, dir string) {
-	files, err := os.ReadDir(dir)
-	if err != nil {
-		dwork_logger.Fatal(err)
-	}
+	parts := strings.Split(path, "/")
 
-	for _, file := range files {
-		if file.IsDir() {
-			recursiveRegisterRoutes(routes, indexPageName, path.Join(dir, file.Name()))
+	var node Routes = *routes
+	for i, part := range parts {
+
+		// Check if is the last part
+		if i == len(parts)-1 {
+			node[part] = &Route{
+				Kind:    "common",
+				Path:    part,
+				Params:  nil,
+				Handler: handler,
+				Routes:  MakeRouter(),
+			}
 			continue
 		}
 
-		if !strings.HasSuffix(file.Name(), ".html") {
-			continue
-		}
+		// Check if part not exist in map
+		_, ok := node[part]
 
-		name := strings.TrimSuffix(file.Name(), ".html")
-		content, err := os.ReadFile(path.Join(dir, file.Name()))
-		if err != nil {
-			dwork_logger.Fatal(err)
-		}
-
-		path := "/"
-		if dir != "pages" {
-			path = strings.Split(dir, "pages")[1] + "/"
-		}
-
-		dwork_logger.Info("Registering route " + path + name)
-
-		RegisterRoute(routes, path+name, string(content))
-		if name == indexPageName {
-			RegisterRoute(routes, "/", string(content))
-		}
-
-		dwork_logger.Success("Route " + name + " registered!")
-	}
-}
-
-func AutoRegisterRoutes(routes *map[string]Route, indexPageName string) {
-	// Procura se tem arquivos html dentro da pasta pages
-	_, err := os.Stat("pages")
-	if os.IsNotExist(err) {
-		dwork_logger.Fatal("Pages directory not found!")
-	}
-
-	recursiveRegisterRoutes(routes, indexPageName, "pages")
-}
-
-func EnableHandler(routes *map[string]Route) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		route, ok := (*routes)[r.RequestURI]
 		if !ok {
-			http.NotFound(w, r)
+			node[part] = &Route{
+				Kind:    "common",
+				Path:    part,
+				Params:  nil,
+				Handler: handler,
+				Routes:  MakeRouter(),
+			}
+
+			node = node[part].Routes
 		}
 
-		fmt.Fprint(w, route.Content)
+		if ok {
+			node = node[part].Routes
+		}
+
+	}
+}
+
+// TODO: specialRoute
+// * func specialRoute(routes *Routes, path string, handler RouteHandler) {}
+
+func RegisterRoute(routes *Routes, path string, handler RouteHandler) {
+
+	// Check if is not a special route
+	if !strings.Contains(path, ":") {
+		commonRoute(routes, path, handler)
+		return
+	}
+}
+
+// TODO: RegisterDynamicRoute
+func RegisterDynamicRoute(routes *Routes, path string, handler DynamicRouteHandler) {
+
+}
+
+func EnableRouter(routes *Routes) {
+	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+		path := req.URL.Path
+		path = strings.TrimLeft(path, "/")
+		path = strings.TrimRight(path, "/")
+
+		parts := strings.Split(path, "/")
+		var node Routes = *routes
+
+		var route *Route = nil
+		for i, part := range parts {
+
+			// If the last part try to get the route
+			if i == len(parts)-1 {
+				if _, ok := node[part]; !ok {
+					route = nil
+					continue
+				}
+
+				route = node[part]
+			}
+
+			// Check if part exist in map
+			if _, ok := node[part]; !ok {
+				continue
+			}
+
+			route = node[part]
+			node = route.Routes
+		}
+
+		if route == nil || route.Handler == nil {
+			http.NotFound(res, req)
+			return
+		}
+
+		content := route.Handler(res, req)
+		fmt.Fprint(res, content)
 	})
 }
