@@ -1,4 +1,4 @@
-package dworkweb
+package dwork_web
 
 import (
 	"fmt"

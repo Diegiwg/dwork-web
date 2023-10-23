@@ -1,4 +1,4 @@
-package dworkweb_test
+package dwork_web_test
 
 import (
 	"testing"
