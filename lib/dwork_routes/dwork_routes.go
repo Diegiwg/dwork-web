@@ -27,20 +27,15 @@ func RegisterRoute(routes *map[string]Route, path string, content string) {
 	}
 }
 
-func AutoRegisterRoutes(routes *map[string]Route, indexPageName string) {
-	// Procura se tem arquivos html dentro da pasta pages
-	_, err := os.Stat("pages")
-	if os.IsNotExist(err) {
-		dwork_logger.Fatal("Pages directory not found!")
-	}
-
-	files, err := os.ReadDir("pages")
+func recursiveRegisterRoutes(routes *map[string]Route, indexPageName string, dir string) {
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		dwork_logger.Fatal(err)
 	}
 
 	for _, file := range files {
 		if file.IsDir() {
+			recursiveRegisterRoutes(routes, indexPageName, path.Join(dir, file.Name()))
 			continue
 		}
 
@@ -49,20 +44,35 @@ func AutoRegisterRoutes(routes *map[string]Route, indexPageName string) {
 		}
 
 		name := strings.TrimSuffix(file.Name(), ".html")
-		dwork_logger.Info("Registering route " + name)
-
-		content, err := os.ReadFile(path.Join("pages", file.Name()))
+		content, err := os.ReadFile(path.Join(dir, file.Name()))
 		if err != nil {
 			dwork_logger.Fatal(err)
 		}
 
-		RegisterRoute(routes, "/"+name, string(content))
+		path := "/"
+		if dir != "pages" {
+			path = strings.Split(dir, "pages")[1] + "/"
+		}
+
+		dwork_logger.Info("Registering route " + path + name)
+
+		RegisterRoute(routes, path+name, string(content))
 		if name == indexPageName {
 			RegisterRoute(routes, "/", string(content))
 		}
 
 		dwork_logger.Success("Route " + name + " registered!")
 	}
+}
+
+func AutoRegisterRoutes(routes *map[string]Route, indexPageName string) {
+	// Procura se tem arquivos html dentro da pasta pages
+	_, err := os.Stat("pages")
+	if os.IsNotExist(err) {
+		dwork_logger.Fatal("Pages directory not found!")
+	}
+
+	recursiveRegisterRoutes(routes, indexPageName, "pages")
 }
 
 func EnableHandler(routes *map[string]Route) {
