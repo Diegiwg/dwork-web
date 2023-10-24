@@ -1,8 +1,12 @@
 # DWork Web Framework
 
-## Current Version: 0.0.4
+## Current Version: 0.0.5
 
 ## Changelog
+
+### Version 0.0.5
+
+    - Improved the documentation.
 
 ### Version 0.0.4
 

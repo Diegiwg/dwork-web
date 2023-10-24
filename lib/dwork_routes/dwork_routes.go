@@ -135,16 +135,12 @@ func parseRoute(routes *Routes, parts []string, route **Route, params *RoutePara
 		if i == len(parts)-1 {
 			// Check if exist in node
 			if _, ok := node[part]; ok {
-				dwork_logger.Debug("lC:", part)
-
 				*route = node[part]
 				continue
 			}
 
 			// Check if in node routes exist a special route
 			if _, ok := node["@"]; ok {
-				dwork_logger.Debug("lS:", part)
-
 				*route = node["@"]
 				(*params)[(*route).Param] = part
 				continue
@@ -153,16 +149,12 @@ func parseRoute(routes *Routes, parts []string, route **Route, params *RoutePara
 
 		// Check if exist in node routes
 		if _, ok := node[part]; ok {
-			dwork_logger.Debug("C:", part)
-
 			node = node[part].Routes
 			continue
 		}
 
 		// Check if in node routes exist a special route
 		if _, ok := node["@"]; ok {
-			dwork_logger.Debug("S:", part)
-
 			r := node["@"]
 
 			(*params)[(*r).Param] = part

@@ -1,6 +1,6 @@
 # DWork Web
 
-DWork Web is a lightweight and dependency-free web framework for Go, designed to simplify web application development. It acts as a wrapper for the original `net/http` package in Go, enhancing it with additional features. The framework includes a flexible logging system (dwork_logger) and a powerful routing engine (dwork_routes) that enables the creation of both static and dynamic routes.
+DWork Web is a web framework for Go that's lightweight and free from external dependencies. It's designed to simplify web application development by providing essential features. This framework acts as an extension to Go's native net/http package and includes a flexible logging system (dwork_logger) and a robust routing engine (dwork_routes) for creating both static and dynamic routes.
 
 ## Table of Contents
 
@@ -11,6 +11,11 @@ DWork Web is a lightweight and dependency-free web framework for Go, designed to
   - [Static Routes](#static-routes)
   - [Dynamic Routes](#dynamic-routes)
   - [Logging (dwork_logger)](#logging-dwork_logger)
+- [Example](#example)
+- [Usage](#usage)
+  - [Router Usage](#router-usage)
+  - [Static Routes Usage](#static-routes-usage)
+  - [Dynamic Routes Usage](#dynamic-routes-usage)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -18,76 +23,93 @@ DWork Web is a lightweight and dependency-free web framework for Go, designed to
 
 ### Installation
 
-To install DWork Web, you can use `go get`:
+To kickstart your DWork Web experience, initiate the installation process by using the following command:
 
 ```bash
 go get github.com/Diegiwg/dwork-web
-```
-
-### Usage
-
-Here's an example of how to use DWork Web in your Go application:
-
-```go
-package main
-
-import (
-    "net/http"
-    "github.com/Diegiwg/dwork-web/lib/dwork_logger"
-    "github.com/Diegiwg/dwork-web/lib/dwork_routes"
-)
-
-func main() {
-    // Create a new router
-    routes := dwork_routes.MakeRouter()
-    dwork_routes.EnableRouter(&routes)
-
-    // Static Routes
-    dwork_routes.RegisterRoute(&routes, "/", func(w http.ResponseWriter, r *http.Request) string {
-        return "Home Page!"
-    })
-    dwork_routes.RegisterRoute(&routes, "/about", func(w http.ResponseWriter, r *http.Request) string {
-        return "About Page!"
-    })
-    dwork_routes.RegisterRoute(&routes, "/faq", func(w http.ResponseWriter, r *http.Request) string {
-        return "FAQ Page!"
-    })
-    dwork_routes.RegisterRoute(&routes, "/faq/project", func(w http.ResponseWriter, r *http.Request) string {
-        return "Project FAQ Page!"
-    })
-
-    // Dynamic Routes
-    dwork_routes.RegisterDynamicRoute(&routes, "/project/:id", func(w http.ResponseWriter, r *http.Request, params dwork_routes.RouteParams) string {
-        return "Project ID: " + params["id"]
-    })
-    dwork_routes.RegisterDynamicRoute(&routes, "/project/:id/:name", func(w http.ResponseWriter, r *http.Request, params dwork_routes.RouteParams) string {
-        return "Project ID: " + params["id"] + "\nProject Name: " + params["name"]
-    })
-
-    // Server
-    dwork_logger.Info("Server listening on http://localhost:8080")
-    http.ListenAndServe(":8080", nil)
-}
 ```
 
 ## Features
 
 ### Static Routes
 
-DWork Web allows you to define static routes easily. Each static route maps to a specific URL path and is associated with a handler function that generates the response.
+DWork Web offers a streamlined approach to define static routes. Each static route is tightly coupled with a specific URL path and linked to a handler function that's responsible for generating the response.
 
 ### Dynamic Routes
 
-Dynamic routes are a powerful feature of DWork Web. You can define routes with placeholders that capture values from the URL, making it easy to work with variable data. These dynamic routes enable you to create flexible and data-driven web applications.
+Dynamic routes are a standout feature of DWork Web. They enable you to define routes with placeholders for capturing values from the URL, simplifying the handling of variable data. With dynamic routes, you can create flexible and data-driven web applications.
 
 ### Logging (dwork_logger)
 
-DWork Web includes a logging system based on log levels, which helps you keep track of the server's activities and troubleshoot any issues.
+DWork Web seamlessly integrates a logging system based on log levels, offering insights into the server's activities and aiding in issue diagnosis.
+
+## Example
+
+Explore our exemple project that showcases the capabilities of DWork Web. To access it, navigate to the [example](https://github.com/Diegiwg/dwork-web/tree/master/example) folder and compile the project.
+
+## Usage
+
+### Router Usage
+
+To begin utilizing the routing system, you must first create an instance of the routes object. Here's a basic example:
+
+```go
+package main
+
+import (
+ "net/http"
+
+ "github.com/Diegiwg/dwork-web/lib/dwork_logger"
+ "github.com/Diegiwg/dwork-web/lib/dwork_routes"
+)
+
+func main() {
+ routes := dwork_routes.MakeRouter()
+ dwork_routes.EnableRouter(&routes)
+
+ // Register your routes here
+
+ dwork_logger.Info("Server listening on http://localhost:8080")
+ http.ListenAndServe(":8080", nil)
+}
+```
+
+### Static Routes Usage
+
+To start using static routes, employ the `RegisterRoute` function. Pass a reference to the routes object, the desired path, and the handler function. For example:
+
+```go
+dwork_routes.RegisterRoute(&routes, "/", func(w http.ResponseWriter, r *http.Request) string {
+  return "<h1>Home Page!</h1>"
+ })
+
+dwork_routes.RegisterRoute(&routes, "/about", func(w http.ResponseWriter, r *http.Request) string {
+  return "<h1>About Page!</h1>"
+ })
+```
+
+### Dynamic Routes Usage
+
+For dynamic routes, utilize the `RegisterDynamicRoute` function. Pass a reference to the routes object, the desired path, and the handler function. Here's an example:
+
+```go
+dwork_routes.RegisterDynamicRoute(&routes, "/user/:id", func(w http.ResponseWriter, r *http.Request) string {
+  return "<h1>UserID:" + params["id"] + "</h1>"
+ })
+
+dwork_routes.RegisterDynamicRoute(&routes, "/user/:id/posts", func(w http.ResponseWriter, r *http.Request) string {
+  return "<h1>Posts of UserID:" + params["id"] + "</h1>"
+})
+
+dwork_routes.RegisterDynamicRoute(&routes, "/user/:id/posts/:name", func(w http.ResponseWriter, r *http.Request) string {
+  return "<h1>Post: " + params["name"] + " of UserID:" + params["id"] + "</h1>"
+})
+```
 
 ## Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests to help improve this project.
+Contributions are warmly welcomed! Whether you're opening issues or submitting pull requests, your efforts can enhance this project.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. For full details, please refer to the [LICENSE](LICENSE) file.

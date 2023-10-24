@@ -40,6 +40,10 @@ func main() {
 		return "Project ID: " + params["id"]
 	})
 
+	dwork_routes.RegisterDynamicRoute(&routes, "/project/:id/:name/show", func(w http.ResponseWriter, r *http.Request, params dwork_routes.RouteParams) string {
+		return "<h1>Project ID:</h1> " + params["id"] + "\n<h1>Name:</h1> " + params["name"]
+	})
+
 	// * Server
 
 	dwork_logger.Info("Server listening on http://localhost:8080")
