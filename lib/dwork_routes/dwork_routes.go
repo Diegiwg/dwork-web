@@ -16,7 +16,7 @@ type RouteParams map[string]string
 type Route struct {
 	Kind           string
 	Path           string
-	Params         RouteParams
+	Param          string
 	Handler        RouteHandler
 	DynamicHandler DynamicRouteHandler
 	Routes         Routes
@@ -49,7 +49,7 @@ func RegisterRoute(routes *Routes, path string, handler RouteHandler) {
 			node[part] = &Route{
 				Kind:           "common",
 				Path:           part,
-				Params:         nil,
+				Param:          "",
 				Handler:        handler,
 				DynamicHandler: nil,
 				Routes:         MakeRouter(),
@@ -62,7 +62,7 @@ func RegisterRoute(routes *Routes, path string, handler RouteHandler) {
 			node[part] = &Route{
 				Kind:           "common",
 				Path:           part,
-				Params:         nil,
+				Param:          "",
 				Handler:        nil,
 				DynamicHandler: nil,
 				Routes:         MakeRouter(),
@@ -95,7 +95,9 @@ func RegisterDynamicRoute(routes *Routes, path string, handler DynamicRouteHandl
 			kind = "special"
 		}
 
+		param := ""
 		if kind == "special" {
+			param = strings.TrimPrefix(part, ":")
 			part = "@"
 		}
 
@@ -104,7 +106,7 @@ func RegisterDynamicRoute(routes *Routes, path string, handler DynamicRouteHandl
 			node[part] = &Route{
 				Kind:           kind,
 				Path:           part,
-				Params:         nil,
+				Param:          param,
 				Handler:        nil,
 				DynamicHandler: handler,
 				Routes:         MakeRouter(),
@@ -117,7 +119,7 @@ func RegisterDynamicRoute(routes *Routes, path string, handler DynamicRouteHandl
 			node[part] = &Route{
 				Kind:           kind,
 				Path:           part,
-				Params:         nil,
+				Param:          param,
 				Handler:        nil,
 				DynamicHandler: nil,
 				Routes:         MakeRouter(),
@@ -129,30 +131,68 @@ func RegisterDynamicRoute(routes *Routes, path string, handler DynamicRouteHandl
 	}
 }
 
-func parseRoute(node Routes, parts []string, route **Route) {
-
-	// params := make(RouteParams)
+func parseRoute(routes *Routes, parts []string, route **Route, params *RouteParams) {
+	var node Routes = *routes
 
 	for i, part := range parts {
 
 		// If the last part try to get the route
 		if i == len(parts)-1 {
-			if _, ok := node[part]; !ok {
-				*route = nil
+			// Nullifier route
+			(*route) = nil
+
+			// Check if exist in node
+			if _, ok := node[part]; ok {
+				*route = node[part]
 				continue
 			}
 
-			*route = node[part]
+			// Check if in node routes exist a special route
+			if _, ok := node["@"]; ok {
+				*route = node["@"]
+
+				(*params)[(*route).Param] = part
+				node = (*route).Routes
+				continue
+			}
 		}
 
-		// Check if part exist in map
-		if _, ok := node[part]; !ok {
+		// Check if exist in node routes
+		if _, ok := node[part]; ok {
+			node = node[part].Routes
 			continue
 		}
 
-		*route = node[part]
-		node = (*route).Routes
+		// Check if in node routes exist a special route
+		if _, ok := node["@"]; ok {
+			*route = node["@"]
+
+			(*params)[(*route).Param] = part
+			node = (*route).Routes
+			continue
+		}
 	}
+
+	// for i, part := range parts {
+
+	// 	// If the last part try to get the route
+	// 	if i == len(parts)-1 {
+	// 		if _, ok := node[part]; !ok {
+	// 			*route = nil
+	// 			continue
+	// 		}
+
+	// 		*route = node[part]
+	// 	}
+
+	// 	// Check if part exist in map
+	// 	if _, ok := node[part]; !ok {
+	// 		continue
+	// 	}
+
+	// 	*route = node[part]
+	// 	node = (*route).Routes
+	// }
 }
 
 func EnableRouter(routes *Routes) {
@@ -162,10 +202,10 @@ func EnableRouter(routes *Routes) {
 		path = strings.TrimRight(path, "/")
 
 		parts := strings.Split(path, "/")
-		var node Routes = *routes
 		var route *Route = nil
+		params := make(RouteParams)
 
-		parseRoute(node, parts, &route)
+		parseRoute(routes, parts, &route, &params)
 
 		if route == nil {
 			http.NotFound(res, req)
@@ -190,7 +230,7 @@ func EnableRouter(routes *Routes) {
 		}
 
 		if route.Kind == "special" {
-			content := route.DynamicHandler(res, req, route.Params)
+			content := route.DynamicHandler(res, req, params)
 			fmt.Fprint(res, content)
 			return
 		}
