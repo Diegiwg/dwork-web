@@ -90,13 +90,8 @@ func RegisterDynamicRoute(routes *Routes, path string, handler DynamicRouteHandl
 	var node Routes = *routes
 	for i, part := range parts {
 
-		kind := "common"
-		if strings.Contains(part, ":") {
-			kind = "special"
-		}
-
 		param := ""
-		if kind == "special" {
+		if strings.Contains(part, ":") {
 			param = strings.TrimPrefix(part, ":")
 			part = "@"
 		}
@@ -104,7 +99,7 @@ func RegisterDynamicRoute(routes *Routes, path string, handler DynamicRouteHandl
 		// Check if is the last part
 		if i == len(parts)-1 {
 			node[part] = &Route{
-				Kind:           kind,
+				Kind:           "special",
 				Path:           part,
 				Param:          param,
 				Handler:        nil,
@@ -117,7 +112,7 @@ func RegisterDynamicRoute(routes *Routes, path string, handler DynamicRouteHandl
 		// Check if part not exist in map
 		if _, ok := node[part]; !ok {
 			node[part] = &Route{
-				Kind:           kind,
+				Kind:           "special",
 				Path:           part,
 				Param:          param,
 				Handler:        nil,
@@ -138,61 +133,48 @@ func parseRoute(routes *Routes, parts []string, route **Route, params *RoutePara
 
 		// If the last part try to get the route
 		if i == len(parts)-1 {
-			// Nullifier route
-			(*route) = nil
-
 			// Check if exist in node
 			if _, ok := node[part]; ok {
+				dwork_logger.Debug("lC:", part)
+
 				*route = node[part]
 				continue
 			}
 
 			// Check if in node routes exist a special route
 			if _, ok := node["@"]; ok {
-				*route = node["@"]
+				dwork_logger.Debug("lS:", part)
 
+				*route = node["@"]
 				(*params)[(*route).Param] = part
-				node = (*route).Routes
 				continue
 			}
 		}
 
 		// Check if exist in node routes
 		if _, ok := node[part]; ok {
+			dwork_logger.Debug("C:", part)
+
 			node = node[part].Routes
 			continue
 		}
 
 		// Check if in node routes exist a special route
 		if _, ok := node["@"]; ok {
-			*route = node["@"]
+			dwork_logger.Debug("S:", part)
 
-			(*params)[(*route).Param] = part
-			node = (*route).Routes
+			r := node["@"]
+
+			(*params)[(*r).Param] = part
+			node = (*r).Routes
 			continue
 		}
+
+		// Nullifier route
+		*route = nil
+		return
 	}
 
-	// for i, part := range parts {
-
-	// 	// If the last part try to get the route
-	// 	if i == len(parts)-1 {
-	// 		if _, ok := node[part]; !ok {
-	// 			*route = nil
-	// 			continue
-	// 		}
-
-	// 		*route = node[part]
-	// 	}
-
-	// 	// Check if part exist in map
-	// 	if _, ok := node[part]; !ok {
-	// 		continue
-	// 	}
-
-	// 	*route = node[part]
-	// 	node = (*route).Routes
-	// }
 }
 
 func EnableRouter(routes *Routes) {

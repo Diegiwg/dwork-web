@@ -1,8 +1,14 @@
 # DWork Web Framework
 
-## Current Version: 0.0.3
+## Current Version: 0.0.4
 
 ## Changelog
+
+### Version 0.0.4
+
+    - Improved dynamic route support.
+    - Now, it is possible to have dynamic routes, which are not necessarily limited to having the "parameter" as the last part of the route, e.g.
+        - RegisterDynamicRoute(..., "/project/:id/name", handler), is a route that will work for the following cases: "project/20/name" and "project/xxx/name".
 
 ### Version 0.0.3
 
