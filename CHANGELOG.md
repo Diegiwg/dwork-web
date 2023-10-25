@@ -1,8 +1,16 @@
 # DWork Web Framework
 
-## Current Version: 0.0.5
+## Current Version: 0.0.6
 
 ## Changelog
+
+### Version 0.0.6
+
+    - Modified the route API.
+    - Unified the annotation of Handler functions, which now receive a Context object, providing access to the Request, Response, and Params objects.
+    - Unified the Route Registration functions.
+    - Optimized the parser.
+    - The documentation is now marked as a work in progress, allowing for extensive changes to the API.
 
 ### Version 0.0.5
 

@@ -1,47 +1,48 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Diegiwg/dwork-web/lib/dwork_logger"
-	"github.com/Diegiwg/dwork-web/lib/dwork_routes"
+	"github.com/Diegiwg/dwork-web/lib/routes"
 )
 
 func main() {
-	routes := dwork_routes.MakeRouter()
-	dwork_routes.EnableRouter(&routes)
+	r := routes.MakeRouter()
+	routes.EnableRouter(&r)
 
 	// * Static Routes
 
-	dwork_routes.RegisterRoute(&routes, "/", func(w http.ResponseWriter, r *http.Request) string {
-		return "Home Page!"
+	routes.RegisterRoute(&r, "/", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, "Home Page!")
 	})
-	dwork_routes.RegisterRoute(&routes, "/about", func(w http.ResponseWriter, r *http.Request) string {
-		return "<h1>About Page!</h1>"
+	routes.RegisterRoute(&r, "/about", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, "About Page!")
 	})
-	dwork_routes.RegisterRoute(&routes, "/faq", func(w http.ResponseWriter, r *http.Request) string {
-		return "FAQ Page!"
+	routes.RegisterRoute(&r, "/faq", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, "FAQ Page!")
 	})
-	dwork_routes.RegisterRoute(&routes, "/faq/project", func(w http.ResponseWriter, r *http.Request) string {
-		return "Project FAQ Page!"
+	routes.RegisterRoute(&r, "/faq/project", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, "Project FAQ Page!")
 	})
-
-	dwork_routes.RegisterRoute(&routes, "/project/add", func(w http.ResponseWriter, r *http.Request) string {
-		return "Project Add Page!"
+	routes.RegisterRoute(&r, "/project/add", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, "Project Add Page!")
 	})
 
 	// ! Dynamic Routes
 
-	dwork_routes.RegisterDynamicRoute(&routes, "/project/:id", func(w http.ResponseWriter, r *http.Request, params dwork_routes.RouteParams) string {
-		return "Project ID: " + params["id"]
+	routes.RegisterRoute(&r, "/project/:id", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, "Project ID: "+dc.Params["id"])
 	})
 
-	dwork_routes.RegisterDynamicRoute(&routes, "/project/:id/name", func(w http.ResponseWriter, r *http.Request, params dwork_routes.RouteParams) string {
-		return "Project ID: " + params["id"]
+	routes.RegisterRoute(&r, "/project/:id/name", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, "Project Name: "+dc.Params["id"])
 	})
 
-	dwork_routes.RegisterDynamicRoute(&routes, "/project/:id/:name/show", func(w http.ResponseWriter, r *http.Request, params dwork_routes.RouteParams) string {
-		return "<h1>Project ID:</h1> " + params["id"] + "\n<h1>Name:</h1> " + params["name"]
+	routes.RegisterRoute(&r, "/project/:id/:name/show", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, "Project ID: "+dc.Params["id"]+"\nProject Name: "+dc.Params["name"])
+
 	})
 
 	// * Server
