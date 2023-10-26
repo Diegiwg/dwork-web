@@ -3,7 +3,7 @@ package routes
 import (
 	"strings"
 
-	"github.com/Diegiwg/dwork-web/lib/dwork_logger"
+	"github.com/Diegiwg/dwork-web/lib/logger"
 )
 
 type PathAlreadyExist struct {
@@ -33,11 +33,7 @@ func (err SameParamAlreadyExistsInDynamicRoute) Error() string {
 	return "Same param already exists in dynamic route: '" + err.path + "'. The '" + err.param + "' parameter already exists."
 }
 
-func helperCheckIfExist(node *Routes, part string) *Route {
-	return (*node)[part]
-}
-
-func RegisterRoute(routes *Routes, path string, handler RouteHandler) error {
+func (routes *Routes) RegisterRoute(path string, handler RouteHandler) error {
 
 	parts := strings.Split(strings.TrimLeft(strings.TrimRight(path, "/"), "/"), "/")
 	params := make(map[string]bool)
@@ -58,9 +54,9 @@ func RegisterRoute(routes *Routes, path string, handler RouteHandler) error {
 		if i == len(parts)-1 {
 
 			// Check if this part exist, if so, return a err
-			if ok := helperCheckIfExist(&node, part); ok != nil {
+			if ok := (node)[part]; ok != nil {
 				err := PathAlreadyExist{path}
-				dwork_logger.Error(err)
+				logger.Error(err)
 				return err
 			}
 
@@ -88,7 +84,7 @@ func RegisterRoute(routes *Routes, path string, handler RouteHandler) error {
 		// Check if exist a conflite in Special routes
 		if kind == "special" && node["@"].Param != param {
 			err := ParamsConflictInDynamicRoute{path, node["@"].Param, param}
-			dwork_logger.Error(err)
+			logger.Error(err)
 			return err
 		}
 
@@ -96,7 +92,7 @@ func RegisterRoute(routes *Routes, path string, handler RouteHandler) error {
 			// Check if param exist in params list
 			if temp := params[param]; temp {
 				err := SameParamAlreadyExistsInDynamicRoute{path, param}
-				dwork_logger.Error(err)
+				logger.Error(err)
 				return err
 			}
 

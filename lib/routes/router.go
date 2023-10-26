@@ -26,7 +26,7 @@ func MakeRouter() Routes {
 	return make(map[string]*Route)
 }
 
-func EnableRouter(routes *Routes) {
+func (routes *Routes) Enable() {
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 
 		route, params := parse(routes, req.URL.Path)

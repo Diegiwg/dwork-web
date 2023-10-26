@@ -67,7 +67,7 @@ func TestRegisterRoute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			RegisterRoute(tt.args.routes, tt.args.path, tt.args.handler)
+			r.RegisterRoute(tt.args.path, tt.args.handler)
 
 			node := tt.args.routes
 			for _, part := range tt.args.expected {

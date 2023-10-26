@@ -1,8 +1,13 @@
 # DWork Web Framework
 
-## Current Version: 0.0.9
+## Current Version: 0.0.10
 
 ## Changelog
+
+### Version 0.0.10
+
+    - Modified the Router API to include the Enable (EnableRouter) and RegisterRoute functions as methods of the router object..
+    - Now, you first use the router object and utilize its functions as methods to define routes. 
 
 ### Version 0.0.9
 

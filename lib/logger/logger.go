@@ -1,4 +1,4 @@
-package dwork_logger
+package logger
 
 import (
 	"fmt"
