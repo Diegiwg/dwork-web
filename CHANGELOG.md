@@ -7,7 +7,8 @@
 ### Version 0.0.10
 
     - Modified the Router API to include the Enable (EnableRouter) and RegisterRoute functions as methods of the router object..
-    - Now, you first use the router object and utilize its functions as methods to define routes. 
+    - Now, you first use the router object and utilize its functions as methods to define routes.
+    - The logging module has been moved to lib/logger (formerly lib/dwork_logger).
 
 ### Version 0.0.9
 
