@@ -25,3 +25,23 @@ type Routes map[string]*Route
 func MakeRouter() Routes {
 	return make(map[string]*Route)
 }
+
+func EnableRouter(routes *Routes) {
+	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+
+		route, params := parse(routes, req.URL.Path)
+
+		if route == nil || route.Handler == nil {
+			http.NotFound(res, req)
+			return
+		}
+
+		context := DWorkContext{
+			Params:   params,
+			Response: res,
+			Request:  req,
+		}
+
+		route.Handler(context)
+	})
+}

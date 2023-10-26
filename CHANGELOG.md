@@ -1,8 +1,13 @@
 # DWork Web Framework
 
-## Current Version: 0.0.7
+## Current Version: 0.0.8
 
 ## Changelog
+
+### Version 0.0.8
+
+    - Moved the function for loading custom HTTP handlers from `parse.go` to `router.go`.
+    - Added a test suite for the parser functionality.
 
 ### Version 0.0.7
 
