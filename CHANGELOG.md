@@ -1,8 +1,13 @@
 # DWork Web Framework
 
-## Current Version: 0.0.6
+## Current Version: 0.0.7
 
 ## Changelog
+
+### Version 0.0.7
+
+    - Added TODOs for route collision checking.
+    - Added a test suite for the route registration function.
 
 ### Version 0.0.6
 

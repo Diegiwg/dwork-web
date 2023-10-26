@@ -7,8 +7,7 @@ import (
 func RegisterRoute(routes *Routes, path string, handler RouteHandler) {
 
 	// strip the slash's
-	path = strings.TrimLeft(path, "/")
-	path = strings.TrimRight(path, "/")
+	path = strings.TrimLeft(strings.TrimRight(path, "/"), "/")
 
 	parts := strings.Split(path, "/")
 
