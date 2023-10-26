@@ -1,8 +1,17 @@
 # DWork Web Framework
 
-## Current Version: 0.0.8
+## Current Version: 0.0.9
 
 ## Changelog
+
+### Version 0.0.9
+
+    - Developed a route collision checking system, which displays error messages using the `log.Error` level and returns an error that developers can handle.
+    - Checked for the following situations:
+        - Identical static routes.
+        - Identical dynamic routes.
+        - Collision of parameters in routes.
+        - Repeated parameter in a route.
 
 ### Version 0.0.8
 
