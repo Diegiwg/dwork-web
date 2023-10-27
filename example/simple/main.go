@@ -71,6 +71,8 @@ func main() {
 
 	// * Server
 
+	router.Dump()
+
 	logger.Info("Server listening on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }

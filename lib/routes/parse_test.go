@@ -119,7 +119,7 @@ func TestParse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			route, params := parse(&r, tt.args.path)
+			route, params := parse(&r, tt.args.path, "GET")
 
 			if !reflect.DeepEqual(route, tt.args.wantRoute) {
 				t.Errorf("parse() got = %v, want %v", route, tt.args.wantRoute)

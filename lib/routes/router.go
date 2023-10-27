@@ -29,7 +29,8 @@ func MakeRouter() Routes {
 func (routes *Routes) Enable() {
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 
-		route, params := parse(routes, req.URL.Path)
+		verb := req.Method
+		route, params := parse(routes, req.URL.Path, verb)
 
 		if route == nil || route.Handler == nil {
 			http.NotFound(res, req)

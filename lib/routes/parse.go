@@ -4,13 +4,13 @@ import (
 	"strings"
 )
 
-func parse(routes *Routes, path string) (*Route, RouteParams) {
+func parse(routes *Routes, path string, verb string) (*Route, RouteParams) {
 	path = strings.TrimRight(strings.TrimLeft(path, "/"), "/")
 	parts := strings.Split(path, "/")
 
 	// Parse the Route
 	var route *Route = nil
-	var node Routes = *routes
+	var node Routes = (*routes)[verb].Routes
 	params := make(RouteParams)
 
 	for i, part := range parts {

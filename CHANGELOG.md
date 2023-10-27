@@ -1,8 +1,14 @@
 # DWork Web Framework
 
-## Current Version: 0.0.11
+## Current Version: 0.0.12
 
 ## Changelog
+
+### Version 0.0.12
+
+    - Added support for other HTTP verbs.
+    - Introduced a new example of a RESTful API that uses GET, POST, and DELETE.
+    - Added a Dumper function to print the tree of routes.
 
 ### Version 0.0.11
 

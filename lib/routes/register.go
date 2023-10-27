@@ -35,12 +35,21 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 		return err
 	}
 
-	logger.Info("Registering route: " + path + " with verb: " + validVerb)
+	// Create the root node for the verb if not exist
+	if _, ok := (*routes)[validVerb]; !ok {
+		(*routes)[validVerb] = &Route{
+			Kind:    "METHOD",
+			Path:    "",
+			Param:   "",
+			Handler: nil,
+			Routes:  MakeRouter(),
+		}
+	}
 
 	parts := strings.Split(strings.TrimLeft(strings.TrimRight(path, "/"), "/"), "/")
 	params := make(map[string]bool)
 
-	var node Routes = *routes
+	var node Routes = (*routes)[validVerb].Routes
 	for i, part := range parts {
 
 		// * Handle the special part's
