@@ -11,13 +11,13 @@ func TestParse(t *testing.T) {
 
 	r := MakeRouter()
 
-	// ! All Handlers is nil for testing purpose
-	r.RegisterRoute("/", nil)
-	r.RegisterRoute("/faq/project", nil)
-	r.RegisterRoute("/project/add", nil)
-	r.RegisterRoute("/project/:id", nil)
-	r.RegisterRoute("/user/:id/project/:name", nil)
-	r.RegisterRoute("/user/:id/posts/:name/show", nil)
+	// All Handlers is nil for testing purpose
+	r.RegisterRoute(GET, "/", nil)
+	r.RegisterRoute(GET, "/faq/project", nil)
+	r.RegisterRoute(GET, "/project/add", nil)
+	r.RegisterRoute(GET, "/project/:id", nil)
+	r.RegisterRoute(GET, "/user/:id/project/:name", nil)
+	r.RegisterRoute(GET, "/user/:id/posts/:name/show", nil)
 
 	// End of Setup
 

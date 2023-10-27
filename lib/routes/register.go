@@ -6,34 +6,36 @@ import (
 	"github.com/Diegiwg/dwork-web/lib/logger"
 )
 
-type PathAlreadyExist struct {
-	path string
+type HTTPVerb int
+
+const (
+	GET HTTPVerb = iota
+	POST
+	PUT
+	PATCH
+	DELETE
+	HEAD
+	OPTIONS
+)
+
+func (verb HTTPVerb) Parse() (string, error) {
+	verbs := [...]string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
+	if verb < GET || verb > OPTIONS {
+		err := InvalidHttpVerb{}
+		logger.Error(err)
+		return "", err
+	}
+	return verbs[verb], nil
 }
 
-func (err PathAlreadyExist) Error() string {
-	return "Path already exist: '" + err.path + "'"
-}
+func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHandler) error {
 
-type ParamsConflictInDynamicRoute struct {
-	path     string
-	param    string
-	conflict string
-}
+	validVerb, err := verb.Parse()
+	if err != nil {
+		return err
+	}
 
-func (err ParamsConflictInDynamicRoute) Error() string {
-	return "Params conflict in dynamic route: '" + err.path + "'. The '" + err.param + "' parameter already exists, and an attempt was made to add the '" + err.conflict + "' parameter."
-}
-
-type SameParamAlreadyExistsInDynamicRoute struct {
-	path  string
-	param string
-}
-
-func (err SameParamAlreadyExistsInDynamicRoute) Error() string {
-	return "Same param already exists in dynamic route: '" + err.path + "'. The '" + err.param + "' parameter already exists."
-}
-
-func (routes *Routes) RegisterRoute(path string, handler RouteHandler) error {
+	logger.Info("Registering route: " + path + " with verb: " + validVerb)
 
 	parts := strings.Split(strings.TrimLeft(strings.TrimRight(path, "/"), "/"), "/")
 	params := make(map[string]bool)
@@ -41,7 +43,7 @@ func (routes *Routes) RegisterRoute(path string, handler RouteHandler) error {
 	var node Routes = *routes
 	for i, part := range parts {
 
-		// Check if is a Special part
+		// * Handle the special part's
 		param := ""
 		kind := "common"
 		if strings.Contains(part, ":") {
@@ -50,10 +52,10 @@ func (routes *Routes) RegisterRoute(path string, handler RouteHandler) error {
 			part = "@"
 		}
 
-		// Check if is the last part
+		// * Handle the last part
 		if i == len(parts)-1 {
 
-			// Check if this part exist, if so, return a err
+			// * Check if the part already exist, and if so, returns an error
 			if ok := (node)[part]; ok != nil {
 				err := PathAlreadyExist{path}
 				logger.Error(err)
@@ -70,7 +72,7 @@ func (routes *Routes) RegisterRoute(path string, handler RouteHandler) error {
 			continue
 		}
 
-		// Check if part not exist in map
+		// * If the part not exist in node, make it
 		if _, ok := node[part]; !ok {
 			node[part] = &Route{
 				Kind:    kind,
@@ -81,7 +83,7 @@ func (routes *Routes) RegisterRoute(path string, handler RouteHandler) error {
 			}
 		}
 
-		// Check if exist a conflite in Special routes
+		// * Check for conflict of param in current part of the path, and so, returns an error
 		if kind == "special" && node["@"].Param != param {
 			err := ParamsConflictInDynamicRoute{path, node["@"].Param, param}
 			logger.Error(err)
@@ -89,7 +91,7 @@ func (routes *Routes) RegisterRoute(path string, handler RouteHandler) error {
 		}
 
 		if kind == "special" {
-			// Check if param exist in params list
+			// * Check conflict of equal parameters in the path, and so, returns an error
 			if temp := params[param]; temp {
 				err := SameParamAlreadyExistsInDynamicRoute{path, param}
 				logger.Error(err)

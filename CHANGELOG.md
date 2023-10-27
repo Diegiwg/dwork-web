@@ -1,8 +1,13 @@
 # DWork Web Framework
 
-## Current Version: 0.0.10
+## Current Version: 0.0.11
 
 ## Changelog
+
+### Version 0.0.11
+
+    - Errors have been moved to a separate file for better organization.
+    - The implementation of support for HTTP Verbs has been initiated.
 
 ### Version 0.0.10
 
