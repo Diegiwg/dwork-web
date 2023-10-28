@@ -2,13 +2,11 @@
 
 **Note: The documentation for this project is currently under construction.**
 
-**Note: Project Version 0.0.15 is a work in progress.**
-
-DWork Web is a lightweight web framework for Go, designed to simplify web application development. It is free from external dependencies and acts as an extension to Go's native net/http package.
+**Note: Project Version 0.0.16 is a work in progress.**
 
 ## Project Overview
 
-DWork Web is a Go web framework that provides essential features for web application development. While the documentation is a work in progress, you can explore the project's capabilities through the example project, which is continually updated with the latest changes.
+DWork Web is a lightweight web framework for Go, designed to simplify web application development. It is free from external dependencies and acts as an extension to Go's native net/http package.
 
 ## Example Project
 
