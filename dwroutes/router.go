@@ -8,6 +8,16 @@ func MakeRouter() Routes {
 	return make(map[string]*Route)
 }
 
+// Enable enables the Routes.
+//
+// It sets up the HTTP handler for the Routes. When a request comes in, it parses
+// the route and parameters from the URL path and the request method.
+//
+// If the route is not found or the corresponding handler is nil, it returns
+// a 404 Not Found response.
+//
+// If the route is found, it creates a DWorkContext with the parsed parameters,
+// the response writer and the request, and passes it to the route's handler function.
 func (routes *Routes) Enable() {
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 
@@ -29,4 +39,5 @@ func (routes *Routes) Enable() {
 	})
 }
 
+// EnableDebug enables the debug mode.
 func (routes *Routes) EnableDebug() { DEBUG_FLAG = true }
