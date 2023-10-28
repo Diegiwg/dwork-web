@@ -20,7 +20,7 @@ To get started with DWork Web, follow these steps:
    First, make sure you have Go installed on your system. Then, you can install DWork Web using `go get`:
 
    ```sh
-   go get github.com/yourusername/dworkweb
+   go get github.com/Diegiwg/dwork-web
    ```
 
 2. **Import**:
@@ -28,7 +28,7 @@ To get started with DWork Web, follow these steps:
    Import DWork Web into your Go project:
 
    ```go
-   import "github.com/yourusername/dworkweb"
+   import "github.com/Diegiwg/dwork-web"
    ```
 
 3. **Create a Web Application**:
@@ -39,7 +39,7 @@ To get started with DWork Web, follow these steps:
    package main
 
    import (
-       "github.com/yourusername/dworkweb"
+       "github.com/Diegiwg/dwork-web"
    )
 
    func main() {
@@ -101,6 +101,6 @@ For more detailed information and examples on using DWork Web, please refer to t
 
 ---
 
-Feel free to contribute, report issues, or request new features on the [DWork Web GitHub repository](https://github.com/yourusername/dworkweb). We welcome your feedback and contributions to make DWork Web even better!
+Feel free to contribute, report issues, or request new features on the [DWork Web GitHub repository](https://github.com/Diegiwg/dwork-web/). We welcome your feedback and contributions to make DWork Web even better!
 
 Happy coding with DWork Web! 🚀
