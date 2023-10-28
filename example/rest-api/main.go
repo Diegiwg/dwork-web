@@ -11,6 +11,8 @@ func main() {
 	router := routes.MakeRouter()
 	router.Enable()
 
+	router.EnableDebug()
+
 	RegisterUserRoutes(&router)
 
 	router.Dump()

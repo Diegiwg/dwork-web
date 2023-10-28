@@ -5,14 +5,13 @@ import (
 )
 
 func parse(routes *Routes, path string, verb string) (*Route, RouteParams) {
-	path = strings.TrimRight(strings.TrimLeft(path, "/"), "/")
-	parts := strings.Split(path, "/")
 
-	// Parse the Route
+	parts := strings.Split(strings.TrimRight(strings.TrimLeft(path, "/"), "/"), "/")
+
 	var route *Route = nil
-	var node Routes = (*routes)[verb].Routes
 	params := make(RouteParams)
 
+	var node Routes = (*routes)[verb].Routes
 	for i, part := range parts {
 
 		// If the last part try to get the route
@@ -25,8 +24,15 @@ func parse(routes *Routes, path string, verb string) (*Route, RouteParams) {
 
 			// Check if in node routes exist a special route
 			if _, ok := node["@"]; ok {
-				route = node["@"]
-				params[route.Param] = part
+				temp := node["@"]
+
+				typedValue, err := ParseParamType(part, temp.ParamType, path)
+				if err != nil {
+					return nil, nil
+				}
+
+				params[temp.Param] = typedValue
+				route = temp
 				continue
 			}
 		}
@@ -39,10 +45,16 @@ func parse(routes *Routes, path string, verb string) (*Route, RouteParams) {
 
 		// Check if in node routes exist a special route
 		if _, ok := node["@"]; ok {
-			r := node["@"]
+			temp := node["@"]
 
-			params[r.Param] = part
-			node = r.Routes
+			// Convert part::value to paramType::value
+			typedValue, err := ParseParamType(part, temp.ParamType, path)
+			if err != nil {
+				return nil, nil
+			}
+
+			params[temp.Param] = typedValue
+			node = temp.Routes
 			continue
 		}
 

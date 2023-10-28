@@ -41,7 +41,7 @@ func TestRegisterRoute(t *testing.T) {
 			name: "Register Dynamic Route [OK]",
 			args: args{
 				routes:   &r,
-				path:     "/project/:id",
+				path:     "/project/<int:id>",
 				expected: []string{"project", "@"},
 				handler:  nil,
 			},
@@ -50,7 +50,7 @@ func TestRegisterRoute(t *testing.T) {
 			name: "Register Dynamic Route With Two Params [OK]",
 			args: args{
 				routes:   &r,
-				path:     "/user/:id/project/:name",
+				path:     "/user/<int:id>/project/<string:name>",
 				expected: []string{"user", "@", "project", "@"},
 				handler:  nil,
 			},
@@ -59,7 +59,7 @@ func TestRegisterRoute(t *testing.T) {
 			name: "Register Dynamic Route With Two Params and Static Part in Final [OK]",
 			args: args{
 				routes:   &r,
-				path:     "/user/:id/project/:name/show",
+				path:     "/user/<int:id>/project/<string:name>/show",
 				expected: []string{"user", "@", "project", "@", "show"},
 				handler:  nil,
 			},
@@ -69,14 +69,14 @@ func TestRegisterRoute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r.RegisterRoute(GET, tt.args.path, tt.args.handler) // TODO: Test others http verbs
 
-			node := tt.args.routes
+			node := r["GET"].Routes
 			for _, part := range tt.args.expected {
-				temp := (*node)[part]
+				temp := (node)[part]
 
 				if temp == nil {
 					t.Fail()
 				} else {
-					node = &temp.Routes
+					node = temp.Routes
 				}
 
 			}

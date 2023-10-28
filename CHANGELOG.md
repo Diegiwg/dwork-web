@@ -1,8 +1,29 @@
 # DWork Web Framework
 
-## Current Version: 0.0.12
+## Current Version: 0.0.13
 
 ## Changelog
+
+### Version 0.0.13
+
+    - Routes::General
+        - Error and type structures have been moved to separate files.
+        - `Router.Dumper` has been modified to display the 'type' of the parameter.
+        - Added the option to enable Debug mode for the Router with Router.EnableDebug. Currently, this Debug mode provides verbose information about registered routes.
+    - Routes::Errors
+        - Improved error messages with a focus on providing more context to developers.
+    - Routes::Typing
+        - Route parameters are now "strongly" typed.
+        - When defining a parameter in a route, you must provide a type annotation in the format: <type:param>. Supported types include string, int, float, bool, and uuid.
+        - Parameters are checked at runtime, and if a user provides a value that is incompatible with the defined parameter type, a generic 404 error is returned.
+    - Routes::Tests
+        - Tests have been updated to align with the new type system.
+        - New tests have been created for type parsing.
+    - Examples::General
+        - Examples have been updated to match the new type system.
+    - TODOS:
+        - There is a need to manually cast parameters from the URL to their respective types, e.g., `id := dc.Params["id"].(int)`. The idea is to hide Params as a 'raw' variable and attach methods like parseInt(), parseFloat(), parseBool(), parseUUID(), maybe parseString() for safety and sanitization,  to the `context dc`.
+        - Implement descriptive errors for users in case of parameter type mismatches when a 'value' is provided.
 
 ### Version 0.0.12
 

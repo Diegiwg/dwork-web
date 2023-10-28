@@ -2,25 +2,7 @@ package routes
 
 import "net/http"
 
-type RouteParams map[string]string
-
-type DWorkContext struct {
-	Params   RouteParams
-	Response http.ResponseWriter
-	Request  *http.Request
-}
-
-type RouteHandler func(DWorkContext)
-
-type Route struct {
-	Kind    string
-	Path    string
-	Param   string
-	Handler RouteHandler
-	Routes  Routes
-}
-
-type Routes map[string]*Route
+var DEBUG_FLAG bool = false
 
 func MakeRouter() Routes {
 	return make(map[string]*Route)
@@ -46,3 +28,5 @@ func (routes *Routes) Enable() {
 		route.Handler(context)
 	})
 }
+
+func (routes *Routes) EnableDebug() { DEBUG_FLAG = true }
