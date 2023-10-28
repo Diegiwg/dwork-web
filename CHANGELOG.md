@@ -1,8 +1,12 @@
 # DWork Web Framework
 
-## Current Version: 0.0.14
+## Current Version: 0.0.15
 
 ## Changelog
+
+### Version 0.0.15
+
+    - Added in-line documentation to route functions.
 
 ### Version 0.0.14
 

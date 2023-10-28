@@ -8,33 +8,12 @@ import (
 	"github.com/Diegiwg/dwork-web/dwlogger"
 )
 
-func specialParse(part *string, kind *string, param *string, paramType *ParamTypes) error {
-	if !strings.Contains(*part, ":") {
-		return nil
-	}
-
-	// Get the type and name of param
-	test := regexp.MustCompile(`<(?P<type>[\w]+):(?P<name>[\w\d]+)>`)
-	match := test.FindStringSubmatch(*part)
-
-	if len(match) != 3 {
-		return InvalidParamStruct{Param: *part, Path: *part}
-	}
-
-	parsedType := StringToParamType(match[1])
-	if parsedType == NULL {
-		return InvalidParamType{Type: match[1], Param: *part}
-	}
-
-	*paramType = parsedType
-	*param = match[2]
-
-	*kind = "special"
-	*part = "@"
-
-	return nil
-}
-
+// RegisterRoute registers a new route in the Routes struct.
+//
+// The function takes in the HTTPVerb, path, and handler as parameters.
+//
+// It returns an error if there's an issue parsing the verb or if there
+// are conflicts with the path or parameters.
 func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHandler) error {
 
 	validVerb, err := verb.Parse()
@@ -64,10 +43,32 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 		kind := "common"
 
 		// * Handle the special part's
+
 		var paramType ParamTypes = NULL
-		if err := specialParse(&part, &kind, &param, &paramType); err != nil {
-			dwlogger.Error(err)
-			return err
+		if strings.Contains(part, ":") {
+
+			// Get the type and name of param
+			match := (regexp.MustCompile(`<(?P<type>[\w]+):(?P<name>[\w\d]+)>`)).FindStringSubmatch(part)
+
+			if len(match) != 3 {
+				err := InvalidParamStruct{Param: part, Path: part}
+				dwlogger.Error(err)
+				return err
+			}
+
+			parsedType := StringToParamType(match[1])
+			if parsedType == NULL {
+				err := InvalidParamType{Type: match[1], Param: part}
+				dwlogger.Error(err)
+				return err
+			}
+
+			paramType = parsedType
+			param = match[2]
+
+			kind = "special"
+			part = "@"
+
 		}
 
 		// * Check conflict of equal parameters in the path, and so, returns an error

@@ -4,6 +4,21 @@ import (
 	"strings"
 )
 
+// Parse parses the given path and returns the corresponding Route and RouteParams.
+//
+// It takes the following parameters:
+//
+// - routes: a pointer to a Routes object, which contains the routes for different HTTP verbs.
+//
+// - path: a string representing the path to be parsed.
+//
+// - verb: a string representing the HTTP verb.
+//
+// It returns the following:
+//
+// - route: a pointer to the Route object that matches the given path and verb.
+//
+// - params: a map of string to interface{}, which contains the parsed parameters from the path.
 func parse(routes *Routes, path string, verb string) (*Route, RouteParams) {
 
 	parts := strings.Split(strings.TrimRight(strings.TrimLeft(path, "/"), "/"), "/")
