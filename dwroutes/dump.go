@@ -1,10 +1,10 @@
-package routes
+package dwroutes
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/Diegiwg/dwork-web/lib/logger"
+	"github.com/Diegiwg/dwork-web/dwlogger"
 )
 
 func recursiveDump(node Routes, ident int) {
@@ -30,7 +30,7 @@ func recursiveDump(node Routes, ident int) {
 }
 
 func (routes *Routes) Dump() {
-	logger.Debug("Dumping Routes")
+	dwlogger.Debug("Dumping Routes")
 	recursiveDump(*routes, 0)
-	logger.Debug("Routes Dumped")
+	dwlogger.Debug("Routes Dumped")
 }

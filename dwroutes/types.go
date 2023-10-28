@@ -1,11 +1,11 @@
-package routes
+package dwroutes
 
 import (
 	"net/http"
 	"regexp"
 	"strconv"
 
-	"github.com/Diegiwg/dwork-web/lib/logger"
+	"github.com/Diegiwg/dwork-web/dwlogger"
 )
 
 type RouteParams map[string]any
@@ -45,7 +45,7 @@ func (verb HTTPVerb) Parse() (string, error) {
 	verbs := [...]string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
 	if verb < GET || verb > OPTIONS {
 		err := InvalidHttpVerb{}
-		logger.Error(err)
+		dwlogger.Error(err)
 		return "", err
 	}
 	return verbs[verb], nil

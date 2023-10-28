@@ -1,11 +1,11 @@
-package routes
+package dwroutes
 
 import (
 	"fmt"
 	"regexp"
 	"strings"
 
-	"github.com/Diegiwg/dwork-web/lib/logger"
+	"github.com/Diegiwg/dwork-web/dwlogger"
 )
 
 func specialParse(part *string, kind *string, param *string, paramType *ParamTypes) error {
@@ -66,7 +66,7 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 		// * Handle the special part's
 		var paramType ParamTypes = NULL
 		if err := specialParse(&part, &kind, &param, &paramType); err != nil {
-			logger.Error(err)
+			dwlogger.Error(err)
 			return err
 		}
 
@@ -74,7 +74,7 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 		if kind == "special" {
 			if temp := params[param]; temp != EMPTY {
 				err := RepeatedParameter{path, param}
-				logger.Error(err)
+				dwlogger.Error(err)
 				return err
 			}
 
@@ -87,14 +87,14 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 			// * Check for conflict of param in current part of the path, and so, returns an error
 			if kind == "special" && node["@"] != nil && (node["@"].Param != param || node["@"].ParamType != paramType) {
 				err := ParamsConflict{path, node["@"].Param, param}
-				logger.Error(err)
+				dwlogger.Error(err)
 				return err
 			}
 
 			// * Check if the part already exist, and if so, returns an error
 			if ok := (node)[part]; ok != nil {
 				err := PathAlreadyExist{path}
-				logger.Error(err)
+				dwlogger.Error(err)
 				return err
 			}
 
@@ -124,7 +124,7 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 		// * Check for conflict of param in current part of the path, and so, returns an error
 		if kind == "special" && (node["@"].Param != param || node["@"].ParamType != paramType) {
 			err := ParamsConflict{path, node["@"].Param, param}
-			logger.Error(err)
+			dwlogger.Error(err)
 			return err
 		}
 
@@ -133,7 +133,7 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 	}
 
 	if DEBUG_FLAG {
-		logger.Debug("Registered route: " + path + " with params: " + fmt.Sprint(params))
+		dwlogger.Debug("Registered route: " + path + " with params: " + fmt.Sprint(params))
 	}
 
 	return nil
