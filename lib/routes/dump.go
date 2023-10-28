@@ -12,12 +12,18 @@ func recursiveDump(node Routes, ident int) {
 	for key := range node {
 		color := "33"
 		name := key
-		if key == "@" {
-			color = "32"
-			name = "@:" + node[key].Param
+
+		if key == "" {
+			color = "36"
+			name = "index"
 		}
 
-		fmt.Println(strings.Repeat(" ", ident)+"\033["+color+"m["+name+"]:\033[0m", node[key])
+		if key == "@" {
+			color = "32"
+			name = fmt.Sprint("@:<", node[key].ParamType, ":", node[key].Param, ">")
+		}
+
+		fmt.Println(strings.Repeat(" ", ident)+"\033["+color+"m["+name+"]\033[0m", node[key])
 		recursiveDump(node[key].Routes, ident+2)
 	}
 

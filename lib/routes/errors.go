@@ -1,35 +1,63 @@
 package routes
 
+import "fmt"
+
 type PathAlreadyExist struct {
 	path string
 }
 
 func (err PathAlreadyExist) Error() string {
-	return "Path already exist: '" + err.path + "'"
+	return fmt.Sprint("The '", err.path, "' path already exist.")
 }
 
-type ParamsConflictInDynamicRoute struct {
+type ParamsConflict struct {
 	path     string
 	param    string
 	conflict string
 }
 
-func (err ParamsConflictInDynamicRoute) Error() string {
-	return "Params conflict in dynamic route: '" + err.path + "'. The '" + err.param + "' parameter already exists, and an attempt was made to add the '" + err.conflict + "' parameter."
+func (err ParamsConflict) Error() string {
+	return fmt.Sprint("In the '", err.path, "' route there is already a parameter (", err.param, ") in the place where '", err.conflict, "' is being placed.")
 }
 
-type SameParamAlreadyExistsInDynamicRoute struct {
+type RepeatedParameter struct {
 	path  string
 	param string
 }
 
-func (err SameParamAlreadyExistsInDynamicRoute) Error() string {
-	return "Same param already exists in dynamic route: '" + err.path + "'. The '" + err.param + "' parameter already exists."
+func (err RepeatedParameter) Error() string {
+	return fmt.Sprint("The '", err.param, "' parameter already exists in the '", err.path, "' route.")
 }
 
-type InvalidHttpVerb struct {
-}
+type InvalidHttpVerb struct{}
 
 func (err InvalidHttpVerb) Error() string {
-	return "Invalid HTTP Verb"
+	return "Not valid HTTP verb in use."
+}
+
+type InvalidParamType struct {
+	Type  any
+	Param string
+	Path  string
+}
+
+func (err InvalidParamType) Error() string {
+	if err.Path == "" {
+		err.Path = "index"
+	}
+
+	return fmt.Sprint("The '", err.Type, "', in the '", err.Path, "' route is a invalid type for the param '", err.Param, "'.")
+}
+
+type InvalidParamStruct struct {
+	Param string
+	Path  string
+}
+
+func (err InvalidParamStruct) Error() string {
+	if err.Path == "" {
+		err.Path = "index"
+	}
+
+	return fmt.Sprint("The '", err.Param, "', in the '", err.Path, "' route is a invalid param struct.")
 }

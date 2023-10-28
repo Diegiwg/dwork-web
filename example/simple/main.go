@@ -8,68 +8,118 @@ import (
 	"github.com/Diegiwg/dwork-web/lib/routes"
 )
 
+func html(content ...any) string {
+	return fmt.Sprint("<h1>", fmt.Sprint(content...), "</h1>")
+}
+
+func registerStatics(router *routes.Routes) {
+
+	router.RegisterRoute(routes.GET, "/", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, html("Home: "))
+	})
+
+	router.RegisterRoute(routes.GET, "/about", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, html("About: "))
+	})
+
+	router.RegisterRoute(routes.GET, "/about/project", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, html("About Project: "))
+	})
+}
+
+func registerDynamic(router *routes.Routes) {
+
+	router.RegisterRoute(routes.GET, "/user/<int:id>", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, html("User: (UserID: ", dc.Params["id"], ")"))
+	})
+
+	router.RegisterRoute(routes.GET, "/user/<int:id>/project/<string:name>", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, html("Project: (UserID: ", dc.Params["id"], ", ProjectName: ", dc.Params["name"], ")"))
+	})
+
+	router.RegisterRoute(routes.GET, "/user/<int:id>/project/<string:name>/edit", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, html("Project Edit: (UserID: ", dc.Params["id"], ", ProjectName: ", dc.Params["name"], ")"))
+	})
+
+	router.RegisterRoute(routes.GET, "/user/<int:id>/project/<string:name>/delete", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, html("Project Delete: (UserID: ", dc.Params["id"], ", ProjectName: ", dc.Params["name"], ")"))
+	})
+}
+
+func registerStaticOverDynamic(router *routes.Routes) {
+
+	router.RegisterRoute(routes.GET, "/user/all", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, html("All Users: "))
+	})
+
+	router.RegisterRoute(routes.GET, "/user/<int:id>/project/all", func(dc routes.DWorkContext) {
+		fmt.Fprint(dc.Response, html("All Projects of User: (UserID: ", dc.Params["id"], ")"))
+	})
+}
+
+func registerBadRoutes(router *routes.Routes) {
+
+	str := "Error reported successfully!"
+
+	// PathAlreadyExist
+	if err := router.RegisterRoute(routes.GET, "/", nil); err != nil {
+		logger.Info(str)
+	}
+
+	if err := router.RegisterRoute(routes.GET, "/about", nil); err != nil {
+		logger.Info(str)
+	}
+
+	if err := router.RegisterRoute(routes.GET, "/user/<int:id>", nil); err != nil {
+		logger.Info(str)
+	}
+
+	// ParamsConflict
+	if err := router.RegisterRoute(routes.GET, "/user/<uuid:id>/all", nil); err != nil {
+		logger.Info(str)
+	}
+
+	if err := router.RegisterRoute(routes.GET, "/user/<int:id>/project/<uuid:name>", nil); err != nil {
+		logger.Info(str)
+	}
+
+	// RepeatedParameter
+	if err := router.RegisterRoute(routes.GET, "/user/<int:id>/project/<int:id>/edit", nil); err != nil {
+		logger.Info(str)
+	}
+
+	if err := router.RegisterRoute(routes.GET, "/user/<int:id>/project/<string:name>/link/<uuid:id>", nil); err != nil {
+		logger.Info(str)
+	}
+
+	// InvalidHttpVerb
+	fakeHttpVerb := routes.GET + 100
+	if err := router.RegisterRoute(fakeHttpVerb, "/user/<int:id>/project/<string:name>/delete", nil); err != nil {
+		logger.Info(str)
+	}
+
+	// InvalidParamType
+	if err := router.RegisterRoute(routes.GET, "/user/<null:id>/project", nil); err != nil {
+		logger.Info(str)
+	}
+
+	// InvalidParamStruct
+	if err := router.RegisterRoute(routes.GET, "/user/<int:id>/project/string:name", nil); err != nil {
+		logger.Info(str)
+	}
+}
+
 func main() {
 
 	router := routes.MakeRouter()
 	router.Enable()
 
-	// * Static Routes
+	router.EnableDebug()
 
-	router.RegisterRoute(routes.GET, "/", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Home Page!")
-	})
-	// ! Register Same Route for Testing purposes
-	router.RegisterRoute(routes.GET, "/", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Home Page!")
-	})
-
-	router.RegisterRoute(routes.GET, "/about", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "About Page!")
-	})
-	router.RegisterRoute(routes.GET, "/faq", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "FAQ Page!")
-	})
-
-	router.RegisterRoute(routes.GET, "/faq/project", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Project FAQ Page!")
-	})
-	router.RegisterRoute(routes.GET, "/faq/project", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Project FAQ Page!")
-	})
-
-	router.RegisterRoute(routes.GET, "/project/add", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Project Add Page!")
-	})
-
-	// ! Dynamic Routes
-
-	router.RegisterRoute(routes.GET, "/project/:id", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Project ID: "+dc.Params["id"])
-	})
-	router.RegisterRoute(routes.GET, "/project/:id", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Project ID: "+dc.Params["id"])
-	})
-
-	router.RegisterRoute(routes.GET, "/project/:id/name", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Project Name: "+dc.Params["id"])
-	})
-	router.RegisterRoute(routes.GET, "/project/:id/name", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Project Name: "+dc.Params["id"])
-	})
-	router.RegisterRoute(routes.GET, "/project/:other/x", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Project Name: "+dc.Params["id"])
-	})
-
-	router.RegisterRoute(routes.GET, "/project/:id/:name/show", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Project ID: "+dc.Params["id"]+"\nProject Name: "+dc.Params["name"])
-
-	})
-
-	router.RegisterRoute(routes.GET, "/project/:id/name/:id/a", func(dc routes.DWorkContext) {
-		fmt.Fprint(dc.Response, "Project Name: "+dc.Params["id"])
-	})
-
-	// * Server
+	registerStatics(&router)
+	registerDynamic(&router)
+	registerStaticOverDynamic(&router)
+	registerBadRoutes(&router)
 
 	router.Dump()
 

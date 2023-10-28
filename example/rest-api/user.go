@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/Diegiwg/dwork-web/lib/routes"
 )
@@ -45,13 +44,9 @@ func RegisterUserRoutes(router *routes.Routes) {
 	})
 
 	// Delete User
-	router.RegisterRoute(routes.DELETE, "/user/:id", func(dc routes.DWorkContext) {
+	router.RegisterRoute(routes.DELETE, "/user/<int:id>", func(dc routes.DWorkContext) {
 
-		id, err := strconv.Atoi(dc.Params["id"])
-		if err != nil {
-			http.Error(dc.Response, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		id := dc.Params["id"].(int)
 
 		_, ok := users[id]
 		if !ok {
@@ -64,13 +59,9 @@ func RegisterUserRoutes(router *routes.Routes) {
 	})
 
 	// Get User
-	router.RegisterRoute(routes.GET, "/user/:id", func(dc routes.DWorkContext) {
+	router.RegisterRoute(routes.GET, "/user/<int:id>", func(dc routes.DWorkContext) {
 
-		id, err := strconv.Atoi(dc.Params["id"])
-		if err != nil {
-			http.Error(dc.Response, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		id := dc.Params["id"].(int)
 
 		user, ok := users[id]
 		if !ok {

@@ -1,31 +1,38 @@
 package routes
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/Diegiwg/dwork-web/lib/logger"
 )
 
-type HTTPVerb int
-
-const (
-	GET HTTPVerb = iota
-	POST
-	PUT
-	PATCH
-	DELETE
-	HEAD
-	OPTIONS
-)
-
-func (verb HTTPVerb) Parse() (string, error) {
-	verbs := [...]string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
-	if verb < GET || verb > OPTIONS {
-		err := InvalidHttpVerb{}
-		logger.Error(err)
-		return "", err
+func specialParse(part *string, kind *string, param *string, paramType *ParamTypes) error {
+	if !strings.Contains(*part, ":") {
+		return nil
 	}
-	return verbs[verb], nil
+
+	// Get the type and name of param
+	test := regexp.MustCompile(`<(?P<type>[\w]+):(?P<name>[\w\d]+)>`)
+	match := test.FindStringSubmatch(*part)
+
+	if len(match) != 3 {
+		return InvalidParamStruct{Param: *part, Path: *part}
+	}
+
+	parsedType := StringToParamType(match[1])
+	if parsedType == NULL {
+		return InvalidParamType{Type: match[1], Param: *part}
+	}
+
+	*paramType = parsedType
+	*param = match[2]
+
+	*kind = "special"
+	*part = "@"
+
+	return nil
 }
 
 func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHandler) error {
@@ -38,31 +45,51 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 	// Create the root node for the verb if not exist
 	if _, ok := (*routes)[validVerb]; !ok {
 		(*routes)[validVerb] = &Route{
-			Kind:    "METHOD",
-			Path:    "",
-			Param:   "",
-			Handler: nil,
-			Routes:  MakeRouter(),
+			Kind:      "METHOD",
+			Path:      "",
+			Param:     "",
+			ParamType: NULL,
+			Handler:   nil,
+			Routes:    MakeRouter(),
 		}
 	}
 
 	parts := strings.Split(strings.TrimLeft(strings.TrimRight(path, "/"), "/"), "/")
-	params := make(map[string]bool)
+	params := make(map[string]ParamTypes)
 
 	var node Routes = (*routes)[validVerb].Routes
 	for i, part := range parts {
 
-		// * Handle the special part's
 		param := ""
 		kind := "common"
-		if strings.Contains(part, ":") {
-			kind = "special"
-			param = strings.TrimPrefix(part, ":")
-			part = "@"
+
+		// * Handle the special part's
+		var paramType ParamTypes = NULL
+		if err := specialParse(&part, &kind, &param, &paramType); err != nil {
+			logger.Error(err)
+			return err
+		}
+
+		// * Check conflict of equal parameters in the path, and so, returns an error
+		if kind == "special" {
+			if temp := params[param]; temp != EMPTY {
+				err := RepeatedParameter{path, param}
+				logger.Error(err)
+				return err
+			}
+
+			params[param] = paramType
 		}
 
 		// * Handle the last part
 		if i == len(parts)-1 {
+
+			// * Check for conflict of param in current part of the path, and so, returns an error
+			if kind == "special" && node["@"] != nil && (node["@"].Param != param || node["@"].ParamType != paramType) {
+				err := ParamsConflict{path, node["@"].Param, param}
+				logger.Error(err)
+				return err
+			}
 
 			// * Check if the part already exist, and if so, returns an error
 			if ok := (node)[part]; ok != nil {
@@ -72,11 +99,12 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 			}
 
 			node[part] = &Route{
-				Kind:    kind,
-				Path:    part,
-				Param:   param,
-				Handler: handler,
-				Routes:  MakeRouter(),
+				Kind:      kind,
+				Path:      part,
+				Param:     param,
+				ParamType: paramType,
+				Handler:   handler,
+				Routes:    MakeRouter(),
 			}
 			continue
 		}
@@ -84,34 +112,28 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 		// * If the part not exist in node, make it
 		if _, ok := node[part]; !ok {
 			node[part] = &Route{
-				Kind:    kind,
-				Path:    part,
-				Param:   param,
-				Handler: nil,
-				Routes:  MakeRouter(),
+				Kind:      kind,
+				Path:      part,
+				Param:     param,
+				ParamType: paramType,
+				Handler:   nil,
+				Routes:    MakeRouter(),
 			}
 		}
 
 		// * Check for conflict of param in current part of the path, and so, returns an error
-		if kind == "special" && node["@"].Param != param {
-			err := ParamsConflictInDynamicRoute{path, node["@"].Param, param}
+		if kind == "special" && (node["@"].Param != param || node["@"].ParamType != paramType) {
+			err := ParamsConflict{path, node["@"].Param, param}
 			logger.Error(err)
 			return err
 		}
 
-		if kind == "special" {
-			// * Check conflict of equal parameters in the path, and so, returns an error
-			if temp := params[param]; temp {
-				err := SameParamAlreadyExistsInDynamicRoute{path, param}
-				logger.Error(err)
-				return err
-			}
-
-			params[param] = true
-		}
-
 		node = node[part].Routes
 
+	}
+
+	if DEBUG_FLAG {
+		logger.Debug("Registered route: " + path + " with params: " + fmt.Sprint(params))
 	}
 
 	return nil
