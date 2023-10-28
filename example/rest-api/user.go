@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/Diegiwg/dwork-web/lib/routes"
+	"github.com/Diegiwg/dwork-web/dwroutes"
 )
 
 type User struct {
@@ -18,10 +18,10 @@ type User struct {
 var users = make(map[int]*User)
 var counter = 0
 
-func RegisterUserRoutes(router *routes.Routes) {
+func RegisterUserRoutes(router *dwroutes.Routes) {
 
 	// Create User
-	router.RegisterRoute(routes.POST, "/user", func(dc routes.DWorkContext) {
+	router.RegisterRoute(dwroutes.POST, "/user", func(dc dwroutes.DWorkContext) {
 
 		body, err := io.ReadAll(dc.Request.Body)
 		if err != nil {
@@ -44,7 +44,7 @@ func RegisterUserRoutes(router *routes.Routes) {
 	})
 
 	// Delete User
-	router.RegisterRoute(routes.DELETE, "/user/<int:id>", func(dc routes.DWorkContext) {
+	router.RegisterRoute(dwroutes.DELETE, "/user/<int:id>", func(dc dwroutes.DWorkContext) {
 
 		id := dc.Params["id"].(int)
 
@@ -59,7 +59,7 @@ func RegisterUserRoutes(router *routes.Routes) {
 	})
 
 	// Get User
-	router.RegisterRoute(routes.GET, "/user/<int:id>", func(dc routes.DWorkContext) {
+	router.RegisterRoute(dwroutes.GET, "/user/<int:id>", func(dc dwroutes.DWorkContext) {
 
 		id := dc.Params["id"].(int)
 

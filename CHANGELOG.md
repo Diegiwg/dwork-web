@@ -1,8 +1,13 @@
 # DWork Web Framework
 
-## Current Version: 0.0.13
+## Current Version: 0.0.14
 
 ## Changelog
+
+### Version 0.0.14
+
+    - Changing package names for `dwlogger` and `dwroutes`.
+    - Removed `lib` folder.
 
 ### Version 0.0.13
 
