@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 
-	"github.com/Diegiwg/dwork-web/dwroutes"
+	dworkweb "github.com/Diegiwg/dwork-web/dw"
+	"github.com/Diegiwg/dwork-web/dw/types"
 )
 
 type User struct {
@@ -18,21 +18,27 @@ type User struct {
 var users = make(map[int]*User)
 var counter = 0
 
-func RegisterUserRoutes(router *dwroutes.Routes) {
+func RegisterUserRoutes(app *dworkweb.App) {
 
 	// Create User
-	router.RegisterRoute(dwroutes.POST, "/user", func(dc dwroutes.DWorkContext) {
+	app.POST("/user", func(ctx dworkweb.Context) {
 
-		body, err := io.ReadAll(dc.Request.Body)
+		body, err := io.ReadAll(ctx.Request.Raw.Body)
 		if err != nil {
-			http.Error(dc.Response, err.Error(), http.StatusInternalServerError)
+			ctx.Response.Status(types.SC_CE_BadRequest)
+			ctx.Response.Json(types.Json{
+				"error": err,
+			})
 			return
 		}
 
 		var user User
 		err = json.Unmarshal(body, &user)
 		if err != nil {
-			http.Error(dc.Response, err.Error(), http.StatusInternalServerError)
+			ctx.Response.Status(types.SC_CE_BadRequest)
+			ctx.Response.Json(types.Json{
+				"error": err,
+			})
 			return
 		}
 
@@ -40,35 +46,43 @@ func RegisterUserRoutes(router *dwroutes.Routes) {
 		user.Id = counter
 		users[user.Id] = &user
 
-		json.NewEncoder(dc.Response).Encode(user)
+		ctx.Response.Json(user)
 	})
 
 	// Delete User
-	router.RegisterRoute(dwroutes.DELETE, "/user/<int:id>", func(dc dwroutes.DWorkContext) {
+	app.DELETE("/user/<int:id>", func(ctx dworkweb.Context) {
 
-		id := dc.Params["id"].(int)
+		id, _ := ctx.Request.Params.Int("id")
 
 		_, ok := users[id]
 		if !ok {
-			http.Error(dc.Response, "User not found", http.StatusNotFound)
+			ctx.Response.Status(types.SC_CE_NotFound)
+			ctx.Response.Json(types.Json{
+				"error": "User not Founded",
+			})
 			return
 		}
 
 		delete(users, id)
-		fmt.Fprint(dc.Response, "User deleted")
+		ctx.Response.Json(types.Json{
+			"message": fmt.Sprintf("User %d deleted", id),
+		})
 	})
 
 	// Get User
-	router.RegisterRoute(dwroutes.GET, "/user/<int:id>", func(dc dwroutes.DWorkContext) {
+	app.GET("/user/<int:id>", func(ctx dworkweb.Context) {
 
-		id := dc.Params["id"].(int)
+		id, _ := ctx.Request.Params.Int("id")
 
 		user, ok := users[id]
 		if !ok {
-			http.Error(dc.Response, "User not found", http.StatusNotFound)
+			ctx.Response.Status(types.SC_CE_NotFound)
+			ctx.Response.Json(types.Json{
+				"error": "User not Founded",
+			})
 			return
 		}
 
-		json.NewEncoder(dc.Response).Encode(user)
+		ctx.Response.Json(user)
 	})
 }

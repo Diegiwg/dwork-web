@@ -1,21 +1,14 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/Diegiwg/dwork-web/dwlogger"
-	"github.com/Diegiwg/dwork-web/dwroutes"
+	dworkweb "github.com/Diegiwg/dwork-web/dw"
 )
 
 func main() {
-	router := dwroutes.MakeRouter()
-	router.Enable()
+	app := dworkweb.MakeApp()
+	app.Routes().EnableDebug()
 
-	router.EnableDebug()
+	RegisterUserRoutes(&app)
 
-	RegisterUserRoutes(&router)
-
-	router.Dump()
-	dwlogger.Info("Server listening on http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	app.Serve(":8080")
 }

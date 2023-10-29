@@ -1,11 +1,11 @@
-package dwroutes
+package router
 
 import (
 	"fmt"
 	"regexp"
 	"strings"
 
-	"github.com/Diegiwg/dwork-web/dwlogger"
+	"github.com/Diegiwg/dwork-web/dw/logger"
 )
 
 // RegisterRoute registers a new route in the Routes struct.
@@ -52,14 +52,14 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 
 			if len(match) != 3 {
 				err := InvalidParamStruct{Param: part, Path: part}
-				dwlogger.Error(err)
+				logger.Error(err)
 				return err
 			}
 
 			parsedType := StringToParamType(match[1])
 			if parsedType == NULL {
 				err := InvalidParamType{Type: match[1], Param: part}
-				dwlogger.Error(err)
+				logger.Error(err)
 				return err
 			}
 
@@ -75,7 +75,7 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 		if kind == "special" {
 			if temp := params[param]; temp != EMPTY {
 				err := RepeatedParameter{path, param}
-				dwlogger.Error(err)
+				logger.Error(err)
 				return err
 			}
 
@@ -88,14 +88,14 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 			// * Check for conflict of param in current part of the path, and so, returns an error
 			if kind == "special" && node["@"] != nil && (node["@"].Param != param || node["@"].ParamType != paramType) {
 				err := ParamsConflict{path, node["@"].Param, param}
-				dwlogger.Error(err)
+				logger.Error(err)
 				return err
 			}
 
 			// * Check if the part already exist, and if so, returns an error
 			if ok := (node)[part]; ok != nil {
 				err := PathAlreadyExist{path}
-				dwlogger.Error(err)
+				logger.Error(err)
 				return err
 			}
 
@@ -125,7 +125,7 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 		// * Check for conflict of param in current part of the path, and so, returns an error
 		if kind == "special" && (node["@"].Param != param || node["@"].ParamType != paramType) {
 			err := ParamsConflict{path, node["@"].Param, param}
-			dwlogger.Error(err)
+			logger.Error(err)
 			return err
 		}
 
@@ -134,7 +134,7 @@ func (routes *Routes) RegisterRoute(verb HTTPVerb, path string, handler RouteHan
 	}
 
 	if DEBUG_FLAG {
-		dwlogger.Debug("Registered route: " + path + " with params: " + fmt.Sprint(params))
+		logger.Debug("Registered route: " + path + " with params: " + fmt.Sprint(params))
 	}
 
 	return nil
