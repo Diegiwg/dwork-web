@@ -35,8 +35,8 @@ func (app *App) Routes() *router.Routes {
 	return &app.router
 }
 
-func makeRoute(app *App, method router.HTTPVerb, path string, handler func(ctx Context)) {
-	app.router.RegisterRoute(method, path, func(dc router.DWorkContext) {
+func makeRoute(app *App, method router.HTTPVerb, path string, handler func(ctx Context)) error {
+	return app.router.RegisterRoute(method, path, func(dc router.DWorkContext) {
 
 		response := CtxResponse{
 			res: &dc.Response,
@@ -58,8 +58,8 @@ func makeRoute(app *App, method router.HTTPVerb, path string, handler func(ctx C
 	})
 }
 
-func (app *App) GET(path string, handler func(ctx Context)) {
-	makeRoute(app, router.GET, path, handler)
+func (app *App) GET(path string, handler func(ctx Context)) error {
+	return makeRoute(app, router.GET, path, handler)
 }
 
 func (app *App) POST(path string, handler func(ctx Context)) {

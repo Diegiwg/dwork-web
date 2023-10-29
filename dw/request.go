@@ -31,3 +31,14 @@ func (ctx *CtxRequestParams) Int(param string) (int, string) {
 
 	return value, ""
 }
+
+func (ctx *CtxRequestParams) String(param string) (string, string) {
+
+	// Check of the param exists
+	raw, ok := (*ctx.values)[param]
+	if !ok {
+		return "", "ERROR: Param Not Found"
+	}
+
+	return raw.(string), ""
+}
