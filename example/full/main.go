@@ -50,6 +50,9 @@ func main() {
 		})
 	})
 
+	task := project.Group("task")
+	task.Group("client")
+
 	app.Routes().Dump()
 
 	app.Serve(":8080")
