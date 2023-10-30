@@ -9,15 +9,15 @@ import (
 )
 
 type CtxResponse struct {
-	res *http.ResponseWriter
+	Raw *http.ResponseWriter
 }
 
 func (ctx *CtxResponse) Status(code types.StatusCode) {
-	(*ctx.res).WriteHeader(code.Parse())
+	(*ctx.Raw).WriteHeader(code.Parse())
 }
 
 func (ctx *CtxResponse) Json(data interface{}) {
-	res := *ctx.res
+	res := *ctx.Raw
 
 	// Set content type
 	res.Header().Set("Content-Type", "application/json")
@@ -27,7 +27,7 @@ func (ctx *CtxResponse) Json(data interface{}) {
 }
 
 func (ctx *CtxResponse) Text(data string) {
-	res := *ctx.res
+	res := *ctx.Raw
 
 	// Set content type
 	res.Header().Set("Content-Type", "text/plain")
@@ -37,7 +37,7 @@ func (ctx *CtxResponse) Text(data string) {
 }
 
 func (ctx *CtxResponse) Html(data string) {
-	res := *ctx.res
+	res := *ctx.Raw
 
 	// Set content type
 	res.Header().Set("Content-Type", "text/html")

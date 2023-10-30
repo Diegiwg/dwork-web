@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 
 	dworkweb "github.com/Diegiwg/dwork-web/dw"
 	"github.com/Diegiwg/dwork-web/dw/types"
@@ -23,7 +22,7 @@ func RegisterUserRoutes(app *dworkweb.App) {
 	// Create User
 	app.POST("/user", func(ctx dworkweb.Context) {
 
-		body, err := io.ReadAll(ctx.Request.Raw.Body)
+		body, err := ctx.Request.Body()
 		if err != nil {
 			ctx.Response.Status(types.SC_CE_BadRequest)
 			ctx.Response.Json(types.Json{
