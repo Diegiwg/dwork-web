@@ -1,8 +1,12 @@
 # DWork Web Framework
 
-## Current Version: 0.0.16
+## Current Version: 0.0.17
 
 ## Changelog
+
+### Version 0.0.17
+
+    - The main module `App` was created, which should be used to build the project with framework.
 
 ### Version 0.0.16
 

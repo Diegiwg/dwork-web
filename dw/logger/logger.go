@@ -1,4 +1,4 @@
-package dwlogger
+package logger
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package dwroutes
+package router
 
 import (
 	"testing"
