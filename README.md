@@ -1,25 +1,24 @@
 # DWork Web
 
-**Note: The documentation for this project is currently under construction.**
-
-**Note: Project Version 0.0.16 is a work in progress.**
-
 ## Project Overview
 
-DWork Web is a lightweight web framework for Go, designed to simplify web application development. It is free from external dependencies and acts as an extension to Go's native net/http package.
+DWork Web is a lightweight web framework for Go, designed to simplify web application development. It is free from external dependencies and serves as an extension to Go's native net/http package.
 
-## Example Project
+## Project Documentation
 
-To get an idea of DWork Web's current features and usage, you can refer to the [example project](https://github.com/Diegiwg/dwork-web/tree/master/example). This example project showcases how to work with DWork Web and serves as a practical reference.
+You can find the documentation for this project in the following languages:
+
+- [English Documentation](https://dwork.dev/en)
+- [Documentação em Português](https://dwork.dev/pt)
 
 ## Contributing
 
-Contributions to DWork Web are highly encouraged and appreciated. Whether you want to report issues, suggest improvements, or submit pull requests, your efforts can help enhance this project.
+Contributions to DWork Web are highly encouraged and greatly appreciated. Whether you wish to report issues, suggest improvements, or submit pull requests, your contributions are invaluable in enhancing this project.
 
 ## Changelog
 
-For information on the latest changes, updates, and version history, please refer to the [changelog](CHANGELOG.md) file.
+For details about the latest changes, updates, and version history, please refer to the [changelog](CHANGELOG.md) file.
 
 ## License
 
-This project is licensed under the MIT License. Please review the [LICENSE](LICENSE) file for complete details.
+This project is licensed under the MIT License. For comprehensive details, please review the [LICENSE](LICENSE) file.

@@ -10,5 +10,6 @@ func main() {
 
 	RegisterUserRoutes(&app)
 
+	app.Routes().Dump()
 	app.Serve(":8080")
 }
