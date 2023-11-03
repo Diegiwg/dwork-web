@@ -1,37 +1,54 @@
-# 🚀 DWork Web
+# 🚀 DWork Web - Documentation
 
-DWork Web is an experimental web framework designed for simplicity and flexibility.
+Welcome to the DWork Web documentation, an innovative experimental web framework developed with an emphasis on simplicity and flexibility.
 
-## Current Version: 0.0.16
+## Installation
 
-## 📦 Project
+To integrate DWork into your project, use the following command in the terminal:
 
-The project is modular, initially comprising a routing system, a logging system, and an overarching module, the App, which wraps all the modules.
+```bash
+go get github.com/Diegiwg/dwork-web
+```
 
-For everyday development, it is recommended to use the App module, as it simplifies the entire API under the framework.
+## Usage (Basic Example)
 
-## 🌟 Examples
+To start your journey with DWork and create a basic website, begin by importing the package into your Go project:
 
-In the `examples` folder, you can discover some usage examples of the framework, all of which leverage the App module.
+```go
+package main
 
-## 📚 Documentation
+import (
+    dworkweb "github.com/Diegiwg/dwork-web/dw"
+)
+```
 
-Each module has its own documentation, accessible through the following links:
+Next, in the `main` function, create an `app` object using the `MakeApp` method:
 
-- [App Module](https://app)
-- [Routes Module](https://app)
-- [Logs Module](https://app)
+```go
+func main() {
+    app := dworkweb.MakeApp()
+}
+```
 
-To contribute, please follow the guidelines outlined in the [CONTRIBUTING.md](https://github.com/your-project/contributing.md) file.
+To add new routes, select the method corresponding to the desired HTTP verb (`GET`, `POST`, `PUT`, `DELETE`), available on the `app` object. For example, to set up a GET route at `/`:
 
-## 🤝 Contributing
+```go
+app.GET("/", func(ctx dworkweb.Context) {
+    content := `<h1>My First Page with DWork Web (GO + HTML)</h1>`
+    ctx.Response.Html(content)
+})
+```
 
-Contributions to DWork Web are highly encouraged and appreciated. Whether you want to report issues, suggest improvements, or submit pull requests, your efforts can help enhance this project.
+To start the server, use the `Serve` method:
 
-## 📚 Changelog
+```go
+app.Serve(":8080")
+```
 
-For information on the latest changes, updates, and version history, please refer to the [changelog](CHANGELOG.md) file.
+Now you can access [http://localhost:8080/](http://localhost:8080/) and view your first page.
 
-## 📄 License
+- The complete code for this example is available in the [`basic-site`](https://github.com/Diegiwg/dwork-web/tree/master/example/basic-site) directory.
 
-This project is licensed under the MIT License. Please review the [LICENSE](LICENSE) file for complete details.
+## Next Steps
+
+Explore the documentation for the `App` module at [`App Module`](https://diegiwg.github.io/dwork-web/en/modules/app) to understand how to expand your first website. Learn how to add more routes, dynamic routes, and other HTTP verbs to develop more complex and interactive web applications. This knowledge will be a valuable addition to your resume, demonstrating your ability to build robust web applications with DWork Web. Begin this journey to success with DWork Web! 🚀
